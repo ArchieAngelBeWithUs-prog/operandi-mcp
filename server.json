@@ -1,30 +1,32 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
-  "name": "io.operandi/operandi",
-  "description": "Identify an appliance and pull its grounded, safety-checked, robot-executable operation package. Cold, frontier models give confidently wrong physical instructions ~24% of the time; grounded in OPERANDI, 0.",
-  "version": "1.0.0",
+  "name": "cc.operandi/operandi",
+  "description": "Grounded, safety-checked appliance operation packages for robots and agents. Zero-config trial.",
+  "version": "1.0.3",
   "repository": {
-    "url": "https://github.com/operandi/operandi",
+    "url": "https://github.com/ArchieAngelBeWithUs-prog/operandi-mcp",
     "source": "github"
   },
   "packages": [
     {
-      "registry_type": "pypi",
       "identifier": "operandi-mcp",
-      "version": "1.0.0",
-      "transport": { "type": "stdio" },
-      "environment_variables": [
+      "version": "1.0.3",
+      "transport": {
+        "type": "stdio"
+      },
+      "registryType": "pypi",
+      "environmentVariables": [
         {
           "name": "OPERANDI_API_URL",
           "description": "Base URL of the OPERANDI API (default https://api.operandi.cc; use your hosted URL in prod).",
-          "is_required": false,
-          "default": "https://api.operandi.cc"
+          "default": "https://api.operandi.cc",
+          "isRequired": false
         },
         {
           "name": "OPERANDI_API_KEY",
-          "description": "Your OPERANDI API key (from the dev portal). Sent as Authorization: Bearer.",
-          "is_required": true,
-          "is_secret": true
+          "description": "Optional: your OPERANDI key. Leave unset for a zero-config instant trial (the server mints + caches its own key, 2 packages included).",
+          "isRequired": false,
+          "isSecret": true
         }
       ]
     }

@@ -33,8 +33,8 @@ import sys
 API_URL = os.environ.get("OPERANDI_API_URL", "https://api.operandi.cc").rstrip("/")
 API_KEY = os.environ.get("OPERANDI_API_KEY", "")
 SERVER_NAME = "operandi"
-SERVER_VERSION = "1.0.2"
-USER_AGENT = f"operandi-mcp/{'1.0.2'} (+https://operandi.cc)"
+SERVER_VERSION = "1.0.3"
+USER_AGENT = f"operandi-mcp/1.0.3 (+https://operandi.cc)"
 # ^ Cloudflare's bot heuristics 403 the bare Python-urllib UA (found live 2026-07-22);
 #   a named client UA passes. Sent on every request, including the trial mint.
 PROTOCOL_VERSION = "2025-06-18"

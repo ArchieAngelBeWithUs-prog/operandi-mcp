@@ -1,5 +1,8 @@
 # OPERANDI MCP Server — operate real appliances from any agent
 
+
+mcp-name: cc.operandi/operandi
+
 `operandi_mcp_server.py` exposes OPERANDI over the **Model Context Protocol** so any MCP-capable
 agent host (Claude Desktop, Claude Code, or your own agent runtime) can identify an appliance and
 pull its grounded, safety-checked, robot-executable operation package **as native tools**.
