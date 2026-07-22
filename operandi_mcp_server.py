@@ -33,8 +33,45 @@ import sys
 API_URL = os.environ.get("OPERANDI_API_URL", "https://api.operandi.cc").rstrip("/")
 API_KEY = os.environ.get("OPERANDI_API_KEY", "")
 SERVER_NAME = "operandi"
-SERVER_VERSION = "1.0.0"
+SERVER_VERSION = "1.0.1"
 PROTOCOL_VERSION = "2025-06-18"
+
+_KEY_CACHE = os.path.expanduser("~/.operandi/mcp_key")
+
+
+def _ensure_key() -> str:
+    """Zero-config first run: with no OPERANDI_API_KEY set, mint an INSTANT TRIAL key
+    (POST /v1/trial — no signup, 2 packages included) and cache it, so an agent that
+    just installed this server is answering questions seconds later. The API's 402
+    afterwards explains the free/pro upgrade in-band."""
+    global API_KEY
+    if API_KEY:
+        return API_KEY
+    try:
+        with open(_KEY_CACHE, encoding="utf-8") as fh:
+            API_KEY = fh.read().strip()
+            if API_KEY:
+                return API_KEY
+    except OSError:
+        pass
+    import json as _json
+    import urllib.request
+    try:
+        req = urllib.request.Request(f"{API_URL}/v1/trial", data=b"", method="POST",
+                                     headers={"Accept": "application/json"})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            API_KEY = _json.loads(resp.read()).get("api_key", "")
+        if API_KEY:
+            os.makedirs(os.path.dirname(_KEY_CACHE), exist_ok=True)
+            with open(_KEY_CACHE, "w", encoding="utf-8") as fh:
+                fh.write(API_KEY)
+            try:
+                os.chmod(_KEY_CACHE, 0o600)
+            except OSError:
+                pass
+    except Exception:  # noqa: BLE001 — offline/miss just falls back to keyless calls
+        API_KEY = ""
+    return API_KEY
 
 def _request(method: str, path: str, *, params=None, json_body=None) -> tuple[bool, dict | list | str]:
     """One REST call to the OPERANDI API via the stdlib (no deps — matches the SDK's zero-dep ethos,
@@ -48,7 +85,7 @@ def _request(method: str, path: str, *, params=None, json_body=None) -> tuple[bo
         url += "?" + urllib.parse.urlencode({k: v for k, v in params.items() if v is not None})
     data = _json.dumps(json_body).encode() if json_body is not None else None
     headers = {"Accept": "application/json"}
-    if API_KEY:
+    if _ensure_key():
         headers["Authorization"] = f"Bearer {API_KEY}"
     if data is not None:
         headers["Content-Type"] = "application/json"
@@ -58,7 +95,13 @@ def _request(method: str, path: str, *, params=None, json_body=None) -> tuple[bo
             body = resp.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as exc:
         if exc.code == 401:
-            return (False, "Unauthorized — set OPERANDI_API_KEY to a valid key.")
+            return (False, "Unauthorized — set OPERANDI_API_KEY to a valid key "
+                           "(or delete ~/.operandi/mcp_key to mint a fresh instant trial).")
+        if exc.code == 402:
+            detail = exc.read()[:300].decode("utf-8", "replace")
+            return (False, f"Allowance used up. {detail} "
+                           "Sign up free at POST {api}/v1/auth/signup (10 packages/month) or go Pro "
+                           "via POST {api}/v1/billing/checkout.".replace("{api}", API_URL))
         if exc.code == 404:
             return (False, f"Not found: {path}")
         return (False, f"OPERANDI API error {exc.code}: {exc.read()[:300].decode('utf-8', 'replace')}")

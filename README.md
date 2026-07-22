@@ -23,34 +23,34 @@ invented buttons and cycles). Grounded in the package these tools return, that f
 hallucinations, 96% exact**. The tools turn "guess the buttons" into "read the manufacturer's ground
 truth". See `../docs/BUSINESS_MODEL.md`.
 
-## Setup
-
-No SDK to install — the server is stdlib JSON-RPC over stdio (uses `requests`, already present).
-Point it at a running OPERANDI API and give it a key:
+## Setup — zero config
 
 ```bash
-export OPERANDI_API_URL=https://api.operandi.example   # or https://api.operandi.cc for local dev
-export OPERANDI_API_KEY=ok_live_...                     # from the dev portal / /v1/keys
-python mcp/operandi_mcp_server.py                        # an MCP host spawns this over stdio
+pip install operandi-mcp
+```
+
+That's it. **No key needed for your first packages**: on first use the server mints an
+instant trial key itself (`POST /v1/trial` — no signup, 2 operation packages included,
+cached at `~/.operandi/mcp_key`). When the trial is spent, tool responses tell the agent
+exactly how to sign up free (10 packages/month) or go Pro.
+
+Have a key already? Set it and it wins over the trial:
+
+```bash
+export OPERANDI_API_KEY=ok_live_...
 ```
 
 ### Claude Desktop / Claude Code config
-Add to your MCP servers config (e.g. `claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
-    "operandi": {
-      "command": "python",
-      "args": ["/Users/archieshouse/Operandi/mcp/operandi_mcp_server.py"],
-      "env": {
-        "OPERANDI_API_URL": "https://api.operandi.cc",
-        "OPERANDI_API_KEY": "ok_live_your_key_here"
-      }
-    }
+    "operandi": { "command": "operandi-mcp" }
   }
 }
 ```
+
+(Optionally add `"env": {"OPERANDI_API_KEY": "ok_live_..."}` once you have an account key.)
 
 Then ask the agent: *"Identify the Samsung ME20H705MSS and give me the safe procedure to defrost
 0.5 kg of mince."* — it will call `identify_appliance` then `get_operation_package` and answer from
