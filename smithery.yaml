@@ -1,0 +1,23 @@
+# Smithery deployment config (https://smithery.ai) — a stdio MCP server.
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required: ["operandiApiKey"]
+    properties:
+      operandiApiUrl:
+        type: string
+        title: OPERANDI API URL
+        default: "https://api.operandi.cc"
+      operandiApiKey:
+        type: string
+        title: OPERANDI API key
+        description: "From the OPERANDI dev portal."
+  commandFunction: |
+    (config) => ({
+      command: "operandi-mcp",
+      env: {
+        OPERANDI_API_URL: config.operandiApiUrl || "https://api.operandi.cc",
+        OPERANDI_API_KEY: config.operandiApiKey
+      }
+    })

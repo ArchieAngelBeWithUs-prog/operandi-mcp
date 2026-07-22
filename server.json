@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.operandi/operandi",
+  "description": "Identify an appliance and pull its grounded, safety-checked, robot-executable operation package. Cold, frontier models give confidently wrong physical instructions ~24% of the time; grounded in OPERANDI, 0.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/operandi/operandi",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registry_type": "pypi",
+      "identifier": "operandi-mcp",
+      "version": "1.0.0",
+      "transport": { "type": "stdio" },
+      "environment_variables": [
+        {
+          "name": "OPERANDI_API_URL",
+          "description": "Base URL of the OPERANDI API (default https://api.operandi.cc; use your hosted URL in prod).",
+          "is_required": false,
+          "default": "https://api.operandi.cc"
+        },
+        {
+          "name": "OPERANDI_API_KEY",
+          "description": "Your OPERANDI API key (from the dev portal). Sent as Authorization: Bearer.",
+          "is_required": true,
+          "is_secret": true
+        }
+      ]
+    }
+  ]
+}

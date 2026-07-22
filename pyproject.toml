@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "operandi-mcp"
+version = "1.0.0"
+description = "MCP server — let any LLM agent identify an appliance and pull its grounded, safety-checked, robot-executable operation package from OPERANDI."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+authors = [{ name = "OPERANDI" }]
+keywords = ["mcp", "model-context-protocol", "robotics", "appliances", "agents", "embodied-ai", "home-robot"]
+dependencies = []                      # stdlib only — `pip install operandi-mcp` drops into any runtime
+
+[project.scripts]
+operandi-mcp = "operandi_mcp_server:main"
+
+[project.urls]
+Homepage = "https://operandi.cc"
+Documentation = "https://operandi.cc/docs/"
+
+[tool.hatch.build.targets.wheel]
+include = ["operandi_mcp_server.py"]
+
+[tool.hatch.build.targets.sdist]
+include = ["operandi_mcp_server.py", "README.md", "server.json", "smithery.yaml"]
