@@ -33,7 +33,10 @@ import sys
 API_URL = os.environ.get("OPERANDI_API_URL", "https://api.operandi.cc").rstrip("/")
 API_KEY = os.environ.get("OPERANDI_API_KEY", "")
 SERVER_NAME = "operandi"
-SERVER_VERSION = "1.0.1"
+SERVER_VERSION = "1.0.2"
+USER_AGENT = f"operandi-mcp/{'1.0.2'} (+https://operandi.cc)"
+# ^ Cloudflare's bot heuristics 403 the bare Python-urllib UA (found live 2026-07-22);
+#   a named client UA passes. Sent on every request, including the trial mint.
 PROTOCOL_VERSION = "2025-06-18"
 
 _KEY_CACHE = os.path.expanduser("~/.operandi/mcp_key")
@@ -58,7 +61,8 @@ def _ensure_key() -> str:
     import urllib.request
     try:
         req = urllib.request.Request(f"{API_URL}/v1/trial", data=b"", method="POST",
-                                     headers={"Accept": "application/json"})
+                                     headers={"Accept": "application/json",
+                                              "User-Agent": USER_AGENT})
         with urllib.request.urlopen(req, timeout=15) as resp:
             API_KEY = _json.loads(resp.read()).get("api_key", "")
         if API_KEY:
@@ -84,7 +88,7 @@ def _request(method: str, path: str, *, params=None, json_body=None) -> tuple[bo
     if params:
         url += "?" + urllib.parse.urlencode({k: v for k, v in params.items() if v is not None})
     data = _json.dumps(json_body).encode() if json_body is not None else None
-    headers = {"Accept": "application/json"}
+    headers = {"Accept": "application/json", "User-Agent": USER_AGENT}
     if _ensure_key():
         headers["Authorization"] = f"Bearer {API_KEY}"
     if data is not None:

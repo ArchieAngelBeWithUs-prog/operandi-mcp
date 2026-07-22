@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "operandi-mcp"
-version = "1.0.1"
+version = "1.0.2"
 description = "MCP server — let any LLM agent identify an appliance and pull its grounded, safety-checked, robot-executable operation package from OPERANDI."
 readme = "README.md"
 requires-python = ">=3.10"
